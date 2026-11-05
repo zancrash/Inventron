@@ -1,0 +1,6 @@
+@InventronAPI_HostAddress = http://localhost:5206
+
+GET {{InventronAPI_HostAddress}}/product/
+Accept: application/json
+
+###
