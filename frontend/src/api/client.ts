@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://localhost:7199/api';
+const API_BASE_URL = '/api';
 
 export async function request<T>(path: string, init?: RequestInit): Promise<T>
 {

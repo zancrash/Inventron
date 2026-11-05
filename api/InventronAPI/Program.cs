@@ -34,6 +34,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Enabled by docker-compose so a new database container gets its schema on startup.
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+{
+	using var scope = app.Services.CreateScope();
+	scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
