@@ -22,7 +22,7 @@ interface sidebarProps {
 
 export default function Sidebar({sidebarWidth, mobileOpen, onDrawerClose, onDrawerTransitionEnd}: sidebarProps)
 {
-    const renderDrawer = (onNavigate?: () => void) => (
+    const renderDrawer = (_onNavigate?: () => void) => (
     <div>
       <Toolbar>
         <h3>Inventron</h3>

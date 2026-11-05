@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { ProductDto } from "../types/ProductDto";
-import { getProductById } from "../api/products";
+import type { ItemDto } from "../types/ItemDto";
+import { getItemById } from "../api/items";
 import { Alert, Button, CircularProgress } from "@mui/material";
 
 export default function ProductPage() {
 
     const {id} = useParams<{id: string}>();
-    const [product, setProduct] = useState<ProductDto | null>(null);
+    const [product, setProduct] = useState<ItemDto | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +17,7 @@ export default function ProductPage() {
         setError(null);
 
         if (id) {
-            getProductById(parseInt(id), controller.signal)
+            getItemById(parseInt(id), controller.signal)
                 .then((product) => {
                     setProduct(product);
                     setLoading(false);
@@ -42,7 +42,7 @@ export default function ProductPage() {
         <div>
             <h2>{product?.name}</h2>
             <p>{product?.description}</p>
-            <p>Price: ${product?.cost.toFixed(2)}</p>
+            <p>Price: ${product?.standardCost.toFixed(2)}</p>
             <Button href="/inventory">Return to Inventory</Button>
         </div>
     );
