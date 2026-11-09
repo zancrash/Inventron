@@ -30,6 +30,6 @@
 
 		public bool IsActive { get; set; } = true;
 
-		public byte[] RowVersion { get; set; } = [];
+		public uint Version { get; set; }
 	}
 }

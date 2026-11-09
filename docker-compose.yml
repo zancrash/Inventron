@@ -1,17 +1,20 @@
 services:
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: postgres:18
     environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${SA_PASSWORD:?Set SA_PASSWORD in .env}
+       POSTGRES_DB: inventron
+       POSTGRES_USER: inventron
+       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
-      - db-data:/var/opt/mssql
+      - pg-data:/var/lib/postgresql
+    ports:
+      # 5433 on the host because a Windows PostgreSQL service already uses 5432.
+      - "5433:5432"
     healthcheck:
-      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" -b
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U inventron -d inventron"]
+      interval: 5s
       timeout: 5s
-      retries: 12
-      start_period: 20s
+      retries: 10
 
   api:
     build: ./api
@@ -19,7 +22,7 @@ services:
       # Development supplies the temporary tenant until auth exists.
       ASPNETCORE_ENVIRONMENT: Development
       Database__MigrateOnStartup: "true"
-      ConnectionStrings__LocalConnection: Server=db;Database=InventronDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+      ConnectionStrings__LocalConnection: Host=db;Port=5432;Database=inventron;Username=inventron;Password=${POSTGRES_PASSWORD}
     ports:
       - "5206:8080"
     depends_on:
@@ -34,4 +37,4 @@ services:
       - api
 
 volumes:
-  db-data:
+  pg-data:

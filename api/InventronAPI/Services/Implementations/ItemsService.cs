@@ -22,11 +22,12 @@ namespace InventronAPI.Services.Implementations
 
 		public async Task<PagedResult<ItemDto>> GetItemsAsync(ItemQuery q, CancellationToken ct = default)
 		{
+			var pattern = $"%{q.Search}%";
 			var query = _ctx.Items.AsNoTracking().Where(i => i.IsActive);
 
 			if (!string.IsNullOrWhiteSpace(q.Search))
 			{
-				query = query.Where(x => x.Sku.Contains(q.Search) || x.Name.Contains(q.Search));
+				query = query.Where(x => EF.Functions.ILike(x.Sku, pattern) || EF.Functions.ILike(x.Name, pattern));
 			}
 
 			var total = await query.CountAsync(ct);

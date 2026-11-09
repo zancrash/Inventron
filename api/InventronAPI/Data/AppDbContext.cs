@@ -35,12 +35,13 @@ namespace InventronAPI.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			modelBuilder.HasPostgresExtension("citext");
 			modelBuilder.Entity<Item>(b =>
 			{
-				b.Property(i => i.Sku).HasMaxLength(64);
+				b.Property(i => i.Sku).HasColumnType("citext");
 				b.Property(i => i.Name).HasMaxLength(200);
 				b.Property(i => i.UnitOfMeasure).HasMaxLength(20);
-				b.Property(i => i.RowVersion).IsRowVersion();
+				b.Property(i => i.Version).IsRowVersion();
 
 				b.HasIndex(i => new { i.TenantId, i.Sku }).IsUnique();
 

@@ -16,8 +16,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantProvider, HttpTenantProvider>();
 
-builder.Services.AddDbContext<AppDbContext>(options => 
-	options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("LocalConnection")));
 
 builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(ServiceMapper).Assembly));
 
