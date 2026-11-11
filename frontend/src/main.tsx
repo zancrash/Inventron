@@ -7,11 +7,13 @@ import Inventory from './components/Inventory.tsx'
 import Layout from './components/Layout.tsx'
 import Dashboard from './components/Dashboard.tsx'
 import ProductPage from './components/ProductPage.tsx'
+import NewItemPage from './components/NewItemPage.tsx'
 
 const router = createBrowserRouter([
   {path: "/", element: <Layout/>, children: [
       {path: "/", element: <Dashboard/>},
       {path: "/inventory", element: <Inventory/>},
+      {path: "/inventory/new", element: <NewItemPage/>},
       {path: "/inventory/:id", element: <ProductPage/>},
       {path: "*", element: <h2>404: Page not found</h2>},
     ]

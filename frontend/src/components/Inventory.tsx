@@ -1,7 +1,8 @@
 import { useEffect, useState} from "react"
 import type { ItemDto } from "../types/ItemDto";
 import { getItems } from "../api/items";
-import { Alert, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
+import { Alert, Button, CircularProgress, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { Link } from "react-router";
 
 export default function Inventory()
@@ -48,6 +49,11 @@ export default function Inventory()
 
     return(
         <>
+        <Stack direction="row" sx={{ justifyContent: "flex-end", mb: 2 }}>
+            <Button component={Link} to="/inventory/new" variant="contained" startIcon={<AddIcon />}>
+                New item
+            </Button>
+        </Stack>
         <TableContainer component={Paper}>
             <Table size="small">
             <TableHead>
