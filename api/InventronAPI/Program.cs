@@ -1,4 +1,5 @@
 using InventronAPI.Data;
+using InventronAPI.Infrastructure;
 using InventronAPI.Services.Implementations;
 using InventronAPI.Services.Interfaces;
 using InventronAPI.Services.Utils;
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -33,6 +36,8 @@ builder.Services.AddCors(options =>
 
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Enabled by docker-compose so a new database container gets its schema on startup.
 if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
