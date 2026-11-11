@@ -21,13 +21,8 @@ import {
 import { ItemType, type SupplierDto } from "../types/ItemDto";
 import { addItem, type CreateItemDto } from "../api/items";
 import { ApiError } from "../api/client";
+import { itemTypeOptions } from "./data/itemTypes";
 
-const itemTypeOptions: { value: ItemType; label: string }[] = [
-    { value: ItemType.RawMaterial, label: "Raw material" },
-    { value: ItemType.SubAssembly, label: "Sub-assembly" },
-    { value: ItemType.FinishedGood, label: "Finished good" },
-    { value: ItemType.Purchased, label: "Purchased" },
-];
 
 // Suggestions only; the API stores unit of measure as free text.
 const unitOfMeasureOptions = ["Each", "Kg", "Lbs", "g", "m", "cm", "L", "mL", "Roll", "Box"];

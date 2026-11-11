@@ -3,6 +3,7 @@ import type { ItemDto } from "../types/ItemDto";
 import { getItems } from "../api/items";
 import { Alert, Button, CircularProgress, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { formatCurrency } from "../utils/format";
 import { Link } from "react-router";
 
 export default function Inventory()
@@ -14,11 +15,6 @@ export default function Inventory()
     const [pageSize, setPageSize] = useState<number>(50);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
-    const currency = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'CAD',
-    });
 
     useEffect(() => {
         const controller = new AbortController();
@@ -71,8 +67,8 @@ export default function Inventory()
                     <TableCell>{item.sku}</TableCell>
                     <TableCell><Link to={`/inventory/${item.id}`}>{item.name}</Link></TableCell>
                     <TableCell>{item.description ?? '—'}</TableCell>
-                    <TableCell align="right">{currency.format(item.standardCost)}</TableCell>
-                    <TableCell align="right">{item.sellingPrice === null ? '—' : currency.format(item.sellingPrice)}</TableCell>
+                    <TableCell align="right">{formatCurrency(item.standardCost)}</TableCell>
+                    <TableCell align="right">{item.sellingPrice === null ? '—' : formatCurrency(item.sellingPrice)}</TableCell>
                 </TableRow>
                 ))}
             </TableBody>
