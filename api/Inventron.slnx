@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="InventronAPI.IntegrationTests/InventronAPI.IntegrationTests.csproj" />
   <Project Path="InventronAPI/InventronAPI.csproj" />
 </Solution>
