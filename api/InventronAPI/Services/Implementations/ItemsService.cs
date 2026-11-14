@@ -59,28 +59,57 @@ namespace InventronAPI.Services.Implementations
 
 		public async Task<ImportResult> ImportItemsAsync(List<NewItemRequestDto> items, bool dryRun, CancellationToken ct = default)
 		{
+			// Row 1 of the file is the header, so the item at index i is row i + 2.
+			static int RowNumber(int index) => index + 2;
+
 			var errors = new List<ImportRowError>();
 
-			var skus = items.Select(i => i.Sku.Trim().ToUpperInvariant()).ToList();
+			var skus = items.Select(i => (i.Sku ?? "").Trim().ToUpperInvariant()).ToList();
 
-			foreach (var group in skus.Select((sku, index) => (sku, index)).GroupBy(x => x.sku).Where(group => group.Count() > 1))
+			var firstRowBySku = new Dictionary<string, int>();
+			for (var i = 0; i < skus.Count; i++)
 			{
-				foreach(var (sku, index) in group.Skip(1))
+				if (skus[i].Length == 0)
 				{
-					errors.Add(new ImportRowError(index + 1, sku, "Duplicate SKU in import file."));
+					errors.Add(new ImportRowError(RowNumber(i), skus[i], "SKU is required."));
+				}
+				else if (firstRowBySku.TryGetValue(skus[i], out var firstRow))
+				{
+					errors.Add(new ImportRowError(RowNumber(i), skus[i], $"Duplicate SKU in import file (first seen on row {firstRow})."));
+				}
+				else
+				{
+					firstRowBySku[skus[i]] = RowNumber(i);
 				}
 			}
 
-			var existing = await _ctx.Items.Where(i => skus.Contains(i.Sku)).Select(i => i.Sku).ToListAsync(ct);
+			// One WHERE IN query. Upper-case the column because rows added outside the import may not be normalised.
+			var candidateSkus = firstRowBySku.Keys.ToList();
+			var existing = await _ctx.Items
+				.Where(i => candidateSkus.Contains(i.Sku.ToUpper()))
+				.Select(i => i.Sku.ToUpper())
+				.ToListAsync(ct);
+
+			foreach (var sku in existing.Distinct())
+			{
+				errors.Add(new ImportRowError(firstRowBySku[sku], sku, "An item with this SKU already exists."));
+			}
 
 			if (errors.Count > 0)
 			{
-				return new ImportResult(0, errors);
+				return new ImportResult(0, errors.OrderBy(e => e.Row).ToList());
 			}
 
 			if (dryRun) return new(items.Count, errors);   // report what would be created, write nothing
 
-			_ctx.Items.AddRange(_mapper.Map<List<Item>>(items));
+			var newItems = _mapper.Map<List<Item>>(items);
+			for (var i = 0; i < newItems.Count; i++)
+			{
+				newItems[i].Sku = skus[i];
+			}
+
+			// All or nothing: one SaveChanges. The unique index remains the backstop for concurrent imports.
+			_ctx.Items.AddRange(newItems);
 
 			await _ctx.SaveChangesAsync(ct);
 
